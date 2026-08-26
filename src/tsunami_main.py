@@ -196,7 +196,7 @@ if __name__ == '__main__':
     hazus_counties_fc = os.path.join(data_folder, "Hazus_Data.gdb\\Counties")
     census_pop_fc = os.path.join(data_folder, "Census_Data.gdb\\Census_Tract_Population")
     census_blocks = os.path.join(data_folder, "Census_Data.gdb\\Census_Blocks")
-    tsunami_fc = os.path.join(data_folder, "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone")
+    tsunami_fc = os.path.join(data_folder, "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline")
 
     csv_files = [
         "AK_ucmb.csv", 
