@@ -44,7 +44,7 @@ REQUIRED_CSV_FIELDS = ["location", "BLDG_DED", "BLDG_LIMIT", "CNT_DED", "CNT_LIM
                        "foundationtype", "BasementFinishType", "FIRST_FLOOR_ELEV",
                        "BASE_FLOOD_ELEV", "elev_ft"]
 
-def main(in_csv, out_folder, tsunami_polygon, hazus_counties, census_tract_data, census_blocks_data):
+def main(in_csv, out_folder, tsunami_polygon, hazus_counties, census_tract_data, census_blocks_data, dem):
     """
     Main processing function.
 
@@ -54,7 +54,8 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties, census_tract_data,
         tsunami_polygon - Path the Tsunami clipping polygon.
         hazus_counties - Path the County data from Hazus
         census_tract_data - Path to the Census Tract feature class.
-        census_blocks - Path the Census Block feature class.
+        census_blocks - Path to the Census Block feature class.
+        dem - Path to the DEM.
 
     Returns:
         None
@@ -115,7 +116,7 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties, census_tract_data,
 
     # Populate the SiteElevation_UserDefined_ft field
     print("Populating the SiteElevation_UserDefined_ft field...")
-    populate_site_elevation.main(in_fc=fc_path)
+    populate_site_elevation.main(in_fc=fc_path, dem=dem)
 
     # Populate the Building Limit fields
     print("Populating the Building Limit fields...")
@@ -187,13 +188,14 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties, census_tract_data,
 
     # Output the CSV
     print("Exporting the CSV...")
-    convert_to_csv.main(in_fc=fc_path, output_folder=output_folder)
+    convert_to_csv.main(in_fc=fc_path, output_folder=out_folder)
 
 if __name__ == '__main__':
     script_dir = Path(__file__).parent
     data_folder = os.path.join(script_dir.parent, "data")
     output_folder = os.path.join(script_dir.parent, "outputs")
     hazus_counties_fc = os.path.join(data_folder, "Hazus_Data.gdb\\Counties")
+    in_dem = os.path.join(data_folder, "NED_1_3.gdb\\ned_1_3_tsunami_zones")
     census_pop_fc = os.path.join(data_folder, "Census_Data.gdb\\Census_Tract_Population")
     census_blocks = os.path.join(data_folder, "Census_Data.gdb\\Census_Blocks")
     tsunami_fc = os.path.join(data_folder, "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline")
@@ -219,6 +221,7 @@ if __name__ == '__main__':
             tsunami_polygon=tsunami_fc,
             hazus_counties=hazus_counties_fc,
             census_tract_data=census_pop_fc,
-            census_blocks_data=census_blocks)        
+            census_blocks_data=census_blocks,
+            dem=in_dem)
         print("...done")
         print("--------------------------------------------------------\n")
