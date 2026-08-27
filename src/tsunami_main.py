@@ -44,6 +44,12 @@ REQUIRED_CSV_FIELDS = ["location", "BLDG_DED", "BLDG_LIMIT", "CNT_DED", "CNT_LIM
                        "foundationtype", "BasementFinishType", "FIRST_FLOOR_ELEV",
                        "BASE_FLOOD_ELEV", "elev_ft"]
 
+TSU_CSV_FIELDS = ["accntnum", "location", "BLDG_DED", "BLDG_LIMIT", "CNT_DED",
+                  "CNT_LIMIT", "STATE", "POSTCODE", "COUNTRY", "LON", "LAT", "BLDG_VALUE",
+                  "CNT_VALUE", "CONSTR_CODE", "NUM_STORIES", "YEAR_BUILT", "foundationtype",
+                  "BasementFinishType", "FIRST_FLOOR_ELEV", "BASE_FLOOD_ELEV", "elev_ft", 
+                  "BLDG_TYPE", "NUM_UNITS", "UNITS_PER_FLOOR"]
+
 def main(in_csv, out_folder, tsunami_polygon, hazus_counties, census_tract_data, census_blocks_data, dem):
     """
     Main processing function.
@@ -75,54 +81,54 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties, census_tract_data,
             print(f"ERROR: The field {required_column} is missing.")
             sys.exit(1)
 
-    # Create the file geodatabase
+    # Create the file geodatabase - DONE
     print("Creating the file geodatabase...")
     file_gdb_path = create_file_gdb.main(
         folder_path=out_folder,
         gdb_name=csv_name.replace(".csv", ""))
 
-    # Convert the CSV to a feature class
+    # Convert the CSV to a feature class - DONE
     print("Converting CSV...")
     fc_name = convert_from_csv.main(file_gdb_path=file_gdb_path, csv_path=in_csv)
 
-    # Clip the feature class to the tsunami polygons
+    # Clip the feature class to the tsunami polygons - DONE
     print("Clipping points...")
     clipped_fc_name = clip_feature_class.main(
        in_fc=os.path.join(file_gdb_path, fc_name),
        tsunami_polygon=tsunami_polygon)
 
-    # Create a full path to the Points
+    # Create a full path to the Points - DONE
     fc_path = str(os.path.join(file_gdb_path, clipped_fc_name))
 
-    # Add the required fields to the feature class
+    # Add the required fields to the feature class - DONE
     print("Adding required fields...")
     create_fields.main(in_fc=fc_path)
 
-    # Get the FIPs and County Name for each point
+    # Get the FIPs and County Name for each point - DONE
     print("Extracting FIPS and County Names...")
     extract_fips_county_name.main(in_fc=fc_path, hazus_counties=hazus_counties)
 
-    # Get the Census Tract for each point
+    # Get the Census Tract for each point - DONE
     print("Extracting Census Tract...")
     extract_census_tract.main(in_fc=fc_path, census_tract_data=census_tract_data)
 
-    # Get the Census Block ID for each point
+    # Get the Census Block ID for each point - DONE
     print("Populate the CBFips field..")
     populate_cb_fips.main(in_fc=fc_path, census_blocks=census_blocks_data)
 
-    # Populate the ID field
+    # Populate the ID field - DONE
     print("Populating the ID field...")
     populate_id.main(in_fc=fc_path)
 
-    # Populate the SiteElevation_UserDefined_ft field
+    # Populate the SiteElevation_UserDefined_ft field - DONE
     print("Populating the SiteElevation_UserDefined_ft field...")
     populate_site_elevation.main(in_fc=fc_path, dem=dem)
 
-    # Populate the Building Limit fields
+    # Populate the Building Limit fields - DONE
     print("Populating the Building Limit fields...")
     populate_building_limit.main(in_fc=fc_path)
 
-    # Populate the Content Limit fields
+    # Populate the Content Limit fields - DONE
     print("Populating the Content Limit fields...")
     populate_content_limits.main(in_fc=fc_path)
 
@@ -200,19 +206,30 @@ if __name__ == '__main__':
     census_blocks = os.path.join(data_folder, "Census_Data.gdb\\Census_Blocks")
     tsunami_fc = os.path.join(data_folder, "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline")
 
-    csv_files = [
-        "AK_ucmb.csv", 
-        "AK_uni.csv",
-        "CA_ucmb.csv",
-        "CA_uni.csv",
-        "HI_ucmb.csv",
-        "HI_uni.csv", 
-        "OR_ucmb.csv",
-        "OR_uni.csv", 
-        "WA_ucmb.csv",
-        "WA_uni.csv"
+    # Millimian Uncorrelated Data
+    ucmb_path = os.path.join(data_folder, "Milliman_Uncorrelated_Data")
+    ucmb_csv_files = [
+        os.path.join(ucmb_path, "AK_ucmb.csv"), 
+        os.path.join(ucmb_path, "CA_ucmb.csv"),
+        os.path.join(ucmb_path, "HI_ucmb.csv"),
+        os.path.join(ucmb_path, "OR_ucmb.csv"),
+        os.path.join(ucmb_path, "WA_ucmb.csv"),
     ]
 
+    # Millimain Uniform Data
+    uniform_path = os.path.join(data_folder, "Milliman_Uniform_Data")
+    uniform_csv_files = [
+        os.path.join(uniform_path, "AK_uni.csv"), 
+        os.path.join(uniform_path, "CA_uni.csv"),
+        os.path.join(uniform_path, "HI_uni.csv"),
+        os.path.join(uniform_path, "OR_uni.csv"),
+        os.path.join(uniform_path, "WA_uni.csv"),
+    ]
+
+    # All CSV File paths joined
+    csv_files = ucmb_csv_files + uniform_csv_files
+
+    # Iterate and process the csv files
     for csv_file in csv_files:
         print(f"Processing {csv_file}...")
         print("--------------------------------------------------------")
@@ -225,3 +242,5 @@ if __name__ == '__main__':
             dem=in_dem)
         print("...done")
         print("--------------------------------------------------------\n")
+
+    # TODO: Adjust for different source paths and output paths

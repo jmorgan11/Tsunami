@@ -63,6 +63,6 @@ if __name__ == '__main__':
     out_folder = os.path.join(script_dir.parent, "outputs")
 
     census_tracts = os.path.join(data_folder, "Census_Data.gdb\\Census_Tract_Population")
-    feature_class = os.path.join(out_folder, "or_ucmb.gdb\\or_ucmb_points")
+    feature_class = os.path.join(out_folder, "hi_tsu_unc_mb.gdb\\hi_tsu_unc_mb_points")
 
     main(in_fc=feature_class, census_tract_data=census_tracts)

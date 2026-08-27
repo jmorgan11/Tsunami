@@ -45,10 +45,10 @@ def main(file_gdb_path, csv_path):
 
 if __name__ == '__main__':
     script_dir = Path(__file__).parent
-    data_folder = os.path.join(script_dir.parent, "data")
+    data_folder = os.path.join(script_dir.parent, "data\\TSU_Uncorrelated_Data")
     out_folder = os.path.join(script_dir.parent, "outputs")
 
-    file_gdb = os.path.join(out_folder, "mdi_or_mb_20190228.gdb")
-    csv_file = os.path.join(data_folder, "MDI_OR_mb_20190228.csv")
+    file_gdb = os.path.join(out_folder, "hi_tsu_unc_mb.gdb")
+    csv_file = os.path.join(data_folder, "HI_tsu_unc_mb.csv")
 
     main(file_gdb_path=file_gdb, csv_path=csv_file)

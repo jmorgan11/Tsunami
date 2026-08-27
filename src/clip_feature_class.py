@@ -41,10 +41,10 @@ if __name__ == '__main__':
     data_folder = os.path.join(script_dir.parent, "data")
     out_folder = os.path.join(script_dir.parent, "outputs")
 
-    feature_class = os.path.join(out_folder, "or_ucmb.gdb/or_ucmb_points")
+    feature_class = os.path.join(out_folder, "hi_tsu_unc_mb.gdb\\hi_tsu_unc_mb_full_points")
 
     tsunami_fc = os.path.join(
         data_folder,
-        "ASCE_Tsunami_Design_Zones.gdb/ts2022_Tsunami_Design_Zone")
+        "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline")
 
     main(in_fc=feature_class, tsunami_polygon=tsunami_fc)

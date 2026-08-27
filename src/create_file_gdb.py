@@ -46,6 +46,6 @@ def main(folder_path, gdb_name):
 if __name__ == '__main__':
     script_dir = Path(__file__).parent
     out_folder = os.path.join(script_dir.parent, "outputs")
-    out_name = "MDI_OR_mb_20190228".lower()
+    out_name = "hi_tsu_unc_mb".lower()
 
     main(folder_path=out_folder, gdb_name=out_name)

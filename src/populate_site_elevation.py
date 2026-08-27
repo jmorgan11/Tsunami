@@ -56,6 +56,6 @@ if __name__ == '__main__':
     out_folder = os.path.join(script_dir.parent, "outputs")
     data_folder = os.path.join(script_dir.parent, "data")
     in_dem = os.path.join(data_folder, "NED_1_3.gdb\\ned_1_3_tsunami_zones")
-    feature_class = os.path.join(out_folder, "or_ucmb.gdb\\or_ucmb_points")
+    feature_class = os.path.join(out_folder, "hi_tsu_unc_mb.gdb\\hi_tsu_unc_mb_points")
 
     main(in_fc=feature_class, dem=in_dem)
