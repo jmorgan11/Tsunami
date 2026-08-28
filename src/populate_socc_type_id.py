@@ -45,4 +45,4 @@ if __name__ == '__main__':
     main(in_fc=feature_class)
 
 # TODO: Update code for new SOccupID logic. The current logic is a placeholder and needs to be replaced with the 
-# actual logic for determining the SOccupID based on the MDI data.
+#       actual logic for determining the SOccupID based on the MDI data.

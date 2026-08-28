@@ -47,6 +47,6 @@ def main(in_fc):
 if __name__ == '__main__':
     script_dir = Path(__file__).parent
     out_folder = os.path.join(script_dir.parent, "outputs")
-    feature_class = os.path.join(out_folder, "or_ucmb.gdb\\or_ucmb_points")
+    feature_class = os.path.join(out_folder, "hi_tsu_unc_mb.gdb\\hi_tsu_unc_mb_points")
 
     main(in_fc=feature_class)

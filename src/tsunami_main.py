@@ -132,11 +132,11 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties, census_tract_data,
     print("Populating the Content Limit fields...")
     populate_content_limits.main(in_fc=fc_path)
 
-    # Populate the Building Deductible fields
+    # Populate the Building Deductible fields - DONE
     print("Populating the Building Deductible fields...")
     populate_building_deduct.main(in_fc=fc_path)
 
-    # Populate the Content Deductible fields
+    # Populate the Content Deductible fields - DONE
     print("Populating the Content Deductible fields...")
     populate_content_deduct.main(in_fc=fc_path)
 
@@ -201,46 +201,19 @@ if __name__ == '__main__':
     data_folder = os.path.join(script_dir.parent, "data")
     output_folder = os.path.join(script_dir.parent, "outputs")
     hazus_counties_fc = os.path.join(data_folder, "Hazus_Data.gdb\\Counties")
-    in_dem = os.path.join(data_folder, "NED_1_3.gdb\\ned_1_3_tsunami_zones")
+    in_dem = os.path.join(data_folder, "NED_1_3.gdb\\ned_1_3_elev_m")
     census_pop_fc = os.path.join(data_folder, "Census_Data.gdb\\Census_Tract_Population")
     census_blocks = os.path.join(data_folder, "Census_Data.gdb\\Census_Blocks")
-    tsunami_fc = os.path.join(data_folder, "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline")
+    tsunami_fc = os.path.join(
+        data_folder,
+        "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline")
+    input_csv = "AK_uni.csv"
 
-    # Millimian Uncorrelated Data
-    ucmb_path = os.path.join(data_folder, "Milliman_Uncorrelated_Data")
-    ucmb_csv_files = [
-        os.path.join(ucmb_path, "AK_ucmb.csv"), 
-        os.path.join(ucmb_path, "CA_ucmb.csv"),
-        os.path.join(ucmb_path, "HI_ucmb.csv"),
-        os.path.join(ucmb_path, "OR_ucmb.csv"),
-        os.path.join(ucmb_path, "WA_ucmb.csv"),
-    ]
-
-    # Millimain Uniform Data
-    uniform_path = os.path.join(data_folder, "Milliman_Uniform_Data")
-    uniform_csv_files = [
-        os.path.join(uniform_path, "AK_uni.csv"), 
-        os.path.join(uniform_path, "CA_uni.csv"),
-        os.path.join(uniform_path, "HI_uni.csv"),
-        os.path.join(uniform_path, "OR_uni.csv"),
-        os.path.join(uniform_path, "WA_uni.csv"),
-    ]
-
-    # All CSV File paths joined
-    csv_files = ucmb_csv_files + uniform_csv_files
-
-    # Iterate and process the csv files
-    for csv_file in csv_files:
-        print(f"Processing {csv_file}...")
-        print("--------------------------------------------------------")
-        main(in_csv=os.path.join(data_folder, csv_file),
-            out_folder=output_folder,
-            tsunami_polygon=tsunami_fc,
-            hazus_counties=hazus_counties_fc,
-            census_tract_data=census_pop_fc,
-            census_blocks_data=census_blocks,
-            dem=in_dem)
-        print("...done")
-        print("--------------------------------------------------------\n")
-
-    # TODO: Adjust for different source paths and output paths
+    main(in_csv=os.path.join(data_folder, input_csv),
+         out_folder=output_folder,
+         tsunami_polygon=tsunami_fc,
+         hazus_counties=hazus_counties_fc,
+         census_tract_data=census_pop_fc,
+         census_blocks_data=census_blocks,
+         dem=in_dem)
+    print("...done")

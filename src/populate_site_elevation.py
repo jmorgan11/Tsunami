@@ -30,21 +30,37 @@ def main(in_fc, dem):
     """
     try:
         # Drop the field if it already exists
-        if 'ned_1_3_tsunami_zones' in [field.name for field in arcpy.ListFields(dataset=in_fc)]:
-            arcpy.DeleteField_management(in_table=in_fc, drop_field='ned_1_3_tsunami_zones')
+        if 'ned_1_3_elev_m' in [field.name for field in arcpy.ListFields(dataset=in_fc)]:
+            arcpy.DeleteField_management(in_table=in_fc, drop_field='ned_1_3_elev_m')
 
         # Extract the elevation value from the NED for each point
         ExtractMultiValuesToPoints(in_point_features=in_fc, in_rasters=dem)
 
-        # Calculate the SiteElevation_UserDefined_ft field
+        # Calculate the SiteElevation_UserDefined_ft field with the original elev field values
         arcpy.management.CalculateField(
             in_table=in_fc,
             field="SiteElevation_UserDefined_ft",
-            expression=f"!ned_1_3_tsunami_zones! * {METERS_TO_FEET}",
+            expression="!elev_ft!",
             expression_type="PYTHON3")
 
-        # Drop the field
-        arcpy.DeleteField_management(in_table=in_fc, drop_field='ned_1_3_tsunami_zones')
+        # Select original elevation values less than 0
+        elev_field = arcpy.AddFieldDelimiters(in_fc, "SiteElevation_UserDefined_ft")
+        sql_exp = f"{elev_field} < 0 Or {elev_field} IS NULL"
+
+        print(sql_exp)
+        selected_rows = arcpy.management.SelectLayerByAttribute(
+                in_layer_or_view=in_fc,
+                selection_type="NEW_SELECTION",
+                where_clause=sql_exp)
+
+        # Update the SiteElevation_UserDefined_ft field setting the original elev values
+        # that are less than 0 to the NED 1/3 extracted value
+        arcpy.management.CalculateField(
+            in_table=selected_rows,
+            field="SiteElevation_UserDefined_ft",
+            expression=f"!ned_1_3_elev_m! * {METERS_TO_FEET}",  # NED elevations are in meters, so convert them to feet
+            expression_type="PYTHON3")
+
 
     except arcpy.ExecuteError:
         print(arcpy.GetMessages())
@@ -55,7 +71,7 @@ if __name__ == '__main__':
     script_dir = Path(__file__).parent
     out_folder = os.path.join(script_dir.parent, "outputs")
     data_folder = os.path.join(script_dir.parent, "data")
-    in_dem = os.path.join(data_folder, "NED_1_3.gdb\\ned_1_3_tsunami_zones")
+    in_dem = os.path.join(data_folder, "NED_1_3.gdb\\ned_1_3_elev_m")
     feature_class = os.path.join(out_folder, "hi_tsu_unc_mb.gdb\\hi_tsu_unc_mb_points")
 
     main(in_fc=feature_class, dem=in_dem)
