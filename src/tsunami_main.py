@@ -50,7 +50,8 @@ TSU_CSV_FIELDS = ["accntnum", "location", "BLDG_DED", "BLDG_LIMIT", "CNT_DED",
                   "BasementFinishType", "FIRST_FLOOR_ELEV", "BASE_FLOOD_ELEV", "elev_ft", 
                   "BLDG_TYPE", "NUM_UNITS", "UNITS_PER_FLOOR"]
 
-def main(in_csv, out_folder, tsunami_polygon, hazus_counties, census_tract_data, census_blocks_data, dem):
+def main(in_csv, out_folder, tsunami_polygon, hazus_counties, 
+         census_tract_data, census_blocks_data, dem, process_fields):
     """
     Main processing function.
 
@@ -62,6 +63,7 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties, census_tract_data,
         census_tract_data - Path to the Census Tract feature class.
         census_blocks - Path to the Census Block feature class.
         dem - Path to the DEM.
+        process_fields - Tuple of fields for processing (ID field, Longitude, Latitude)
 
     Returns:
         None
@@ -90,6 +92,8 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties, census_tract_data,
     # Convert the CSV to a feature class - DONE
     print("Converting CSV...")
     fc_name = convert_from_csv.main(file_gdb_path=file_gdb_path, csv_path=in_csv)
+
+    # Create a CSV from the full points with USGS elevation values
 
     # Clip the feature class to the tsunami polygons - DONE
     print("Clipping points...")
@@ -207,13 +211,16 @@ if __name__ == '__main__':
     tsunami_fc = os.path.join(
         data_folder,
         "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline")
-    input_csv = "AK_uni.csv"
 
-    main(in_csv=os.path.join(data_folder, input_csv),
+    INPUT_CSV = "AK_uni.csv"
+    req_fields = ("accntnum", "LON", "LAT")
+
+    main(in_csv=os.path.join(data_folder, INPUT_CSV),
          out_folder=output_folder,
          tsunami_polygon=tsunami_fc,
          hazus_counties=hazus_counties_fc,
          census_tract_data=census_pop_fc,
          census_blocks_data=census_blocks,
-         dem=in_dem)
+         dem=in_dem,
+         process_fields=req_fields)
     print("...done")

@@ -29,9 +29,12 @@ def main(in_fc, dem):
         None
     """
     try:
-        # Drop the field if it already exists
+        # Drop fields if it already exists
         if 'ned_1_3_elev_m' in [field.name for field in arcpy.ListFields(dataset=in_fc)]:
             arcpy.DeleteField_management(in_table=in_fc, drop_field='ned_1_3_elev_m')
+
+        if 'USGS_ground_elev_ft' in [field.name for field in arcpy.ListFields(dataset=in_fc)]:
+            arcpy.DeleteField_management(in_table=in_fc, drop_field='USGS_ground_elev_ft')            
 
         # Extract the elevation value from the NED for each point
         ExtractMultiValuesToPoints(in_point_features=in_fc, in_rasters=dem)
@@ -43,21 +46,9 @@ def main(in_fc, dem):
             expression="!elev_ft!",
             expression_type="PYTHON3")
 
-        # Select original elevation values less than 0
-        elev_field = arcpy.AddFieldDelimiters(in_fc, "SiteElevation_UserDefined_ft")
-        sql_exp = f"{elev_field} < 0 Or {elev_field} IS NULL"
-
-        print(sql_exp)
-        selected_rows = arcpy.management.SelectLayerByAttribute(
-                in_layer_or_view=in_fc,
-                selection_type="NEW_SELECTION",
-                where_clause=sql_exp)
-
-        # Update the SiteElevation_UserDefined_ft field setting the original elev values
-        # that are less than 0 to the NED 1/3 extracted value
         arcpy.management.CalculateField(
-            in_table=selected_rows,
-            field="SiteElevation_UserDefined_ft",
+            in_table=in_fc,
+            field="USGS_ground_elev_ft",
             expression=f"!ned_1_3_elev_m! * {METERS_TO_FEET}",  # NED elevations are in meters, so convert them to feet
             expression_type="PYTHON3")
 
