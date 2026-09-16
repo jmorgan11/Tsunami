@@ -9,6 +9,7 @@ import csv
 import os
 import sys
 from pathlib import Path
+import add_usgs_elev
 import clip_feature_class
 import convert_from_csv
 import convert_to_csv
@@ -93,16 +94,21 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
     print("Converting CSV...")
     fc_name = convert_from_csv.main(file_gdb_path=file_gdb_path, csv_path=in_csv)
 
-    # Create a CSV from the full points with USGS elevation values
-
     # Clip the feature class to the tsunami polygons - DONE
     print("Clipping points...")
     clipped_fc_name = clip_feature_class.main(
        in_fc=os.path.join(file_gdb_path, fc_name),
-       tsunami_polygon=tsunami_polygon)
+       tsunami_polygon=tsunami_polygon) 
 
     # Create a full path to the Points - DONE
     fc_path = str(os.path.join(file_gdb_path, clipped_fc_name))
+
+    # Create a CSV from the points with USGS elevation values
+    print("Creating USGS Elevation CSV file...")
+    add_usgs_elev.main(fc_path,
+                       dem=dem,
+                       output_folder=out_folder,
+                       process_fields=process_fields)
 
     # Add the required fields to the feature class - DONE
     print("Adding required fields...")
@@ -182,7 +188,7 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
 
     # Populate the EqDesignLe field
     print("Populating the EqDesignLe field...")
-    populate_eq_design_level.main(in_fc=fc_path)    
+    populate_eq_design_level.main(in_fc=fc_path)
 
     # Populate the Population fields
     print("Populating the Population fields...")
@@ -211,6 +217,14 @@ if __name__ == '__main__':
     tsunami_fc = os.path.join(
         data_folder,
         "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline")
+
+    csv_files = [
+        "AK_ucmb.csv", "AK_uni.csv", "AK_tsu_unc_mb.csv",
+        "CA_ucmb.csv", "CA_uni.csv",
+        "HI_ucmb.csv", "HI_uni.csv", "HI_tsu_unc_mb.csv",
+        "OR_ucmb.csv", "OR_uni.csv", "OR_tsu_unc_mb.csv",
+        "WA_ucmb.csv", "WA_uni.csv", "WA_tsu_unc_mb.csv"
+    ]
 
     INPUT_CSV = "AK_uni.csv"
     req_fields = ("accntnum", "LON", "LAT")

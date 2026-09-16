@@ -52,7 +52,8 @@ def main(in_fc, dem, output_folder, process_fields):
             expression_type="PYTHON3")
 
         # Delete the output file if it already exists
-        out_name = os.path.basename(in_fc).replace("_full_points", "") + ".csv"
+        out_name = os.path.basename(in_fc).replace("_points", "_usgs_elevation") + ".csv"
+
         if arcpy.Exists(os.path.join(output_folder, out_name)):
             arcpy.management.Delete(os.path.join(output_folder, out_name))
 
