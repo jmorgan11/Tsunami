@@ -126,7 +126,7 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
 
     # Populate the SiteElevation_UserDefined_ft field - DONE
     print("Populating the SiteElevation_UserDefined_ft field...")
-    populate_site_elevation.main(in_fc=fc_path, dem=dem)
+    populate_site_elevation.main(in_fc=fc_path)
 
     # Populate the Building Limit fields - DONE
     print("Populating the Building Limit fields...")
