@@ -13,45 +13,26 @@ import os
 import sys
 from pathlib import Path
 import arcpy
-from arcpy.sa import ExtractMultiValuesToPoints
 
 METERS_TO_FEET = 3.2808399
 
-def main(in_fc, dem):
+def main(in_fc):
     """
     Main function.
 
     Arguments:
         in_fc - Path to the feature class to process.
-        dem - The DEM to derived the elevation values from.
 
-    Returns:
+            Returns:
         None
     """
     try:
-        # Drop fields if it already exists
-        if 'ned_1_3_elev_m' in [field.name for field in arcpy.ListFields(dataset=in_fc)]:
-            arcpy.DeleteField_management(in_table=in_fc, drop_field='ned_1_3_elev_m')
-
-        if 'USGS_ground_elev_ft' in [field.name for field in arcpy.ListFields(dataset=in_fc)]:
-            arcpy.DeleteField_management(in_table=in_fc, drop_field='USGS_ground_elev_ft')            
-
-        # Extract the elevation value from the NED for each point
-        ExtractMultiValuesToPoints(in_point_features=in_fc, in_rasters=dem)
-
         # Calculate the SiteElevation_UserDefined_ft field with the original elev field values
         arcpy.management.CalculateField(
             in_table=in_fc,
             field="SiteElevation_UserDefined_ft",
             expression="!elev_ft!",
             expression_type="PYTHON3")
-
-        arcpy.management.CalculateField(
-            in_table=in_fc,
-            field="USGS_ground_elev_ft",
-            expression=f"!ned_1_3_elev_m! * {METERS_TO_FEET}",  # NED elevations are in meters, so convert them to feet
-            expression_type="PYTHON3")
-
 
     except arcpy.ExecuteError:
         print(arcpy.GetMessages())
@@ -62,7 +43,6 @@ if __name__ == '__main__':
     script_dir = Path(__file__).parent
     out_folder = os.path.join(script_dir.parent, "outputs")
     data_folder = os.path.join(script_dir.parent, "data")
-    in_dem = os.path.join(data_folder, "NED_1_3.gdb\\ned_1_3_elev_m")
     feature_class = os.path.join(out_folder, "hi_tsu_unc_mb.gdb\\hi_tsu_unc_mb_points")
 
-    main(in_fc=feature_class, dem=in_dem)
+    main(in_fc=feature_class)
