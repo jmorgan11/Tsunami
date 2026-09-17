@@ -1,8 +1,8 @@
 """
-Filename: extract_census_tract.py
-Purpose: Extract the Census Tract data for each point from the Census Data.
+Filename: extract_ubc_97_zone.py
+Purpose: Extract the UBC97Zone value for each point
 Author: Jesse Morgan
-Date: 5/27/2026
+Date: 9/17/2026
 Updates: None
 """
 import os
@@ -11,13 +11,13 @@ from pathlib import Path
 import arcpy
 
 
-def main(in_fc, census_tract_data):
+def main(in_fc, ubc_97_fc):
     """
-    Extract the Census Tract for each point from the Census Data.
+    Extract the UBC97Zone value for each point.
 
     Arguments:
         in_fc - Path the feature class to update.
-        census_tract_data - The Census Tract data.
+        ubc_97_fc - The UBC97 feature class.
 
     Returns:
         None
@@ -29,30 +29,28 @@ def main(in_fc, census_tract_data):
         base_name = desc.name
 
         # Output path for the spatial join
-        spatial_join_path = os.path.join(db_path, "census_tract_join")
+        spatial_join_path = os.path.join(db_path, "ubc97_join")
         if arcpy.Exists(spatial_join_path):
-            arcpy.management.Delete(os.path.join(db_path, "census_tract_join"))
+            arcpy.management.Delete(os.path.join(db_path, "ubc97_join"))
 
         # Perform spatial join
         spatial_join = arcpy.analysis.SpatialJoin(
             target_features=in_fc,
-            join_features=census_tract_data,
+            join_features=ubc_97_fc,
             out_feature_class=spatial_join_path,
             join_operation="JOIN_ONE_TO_ONE",
             join_type="KEEP_ALL",
             match_option="CLOSEST")
 
         # Drop extra fields
-        for field_name in ["Join_Count", "TARGET_FID", "STATEFP10", "COUNTYFP10", "TRACTCE10",
-                           "NAME10", "NAMELSAD10", "MTFCC10", "FUNCSTAT10", "ALAND10",
-                           "AWATER10", "INTPTLAT10", "INTPTLON10"]:
+        for field_name in ["Join_Count", "TARGET_FID", 'Tract', 'CountyFips', 'Tract6', 'TractArea', 
+                           'CenLongit', 'CenLat', 'Place', 'County', 'County_FIPS', 'State_FIPS', 
+                           'St_Co_FIPS', 'Place_FIPS', 'Combined_Hazard_Code', 'Hurricane_Code', 
+                           'Flood_Code', 'Seismic_Code', 'Tornado_Code', 'Wind_Code', 'Flood_Risk', 
+                           'Seismic_Risk', 'Hurricane_Risk', 'Tornado_Risk', 'Wind_Risk', 
+                           'Hazard_Risk', 'ST_Abbrev', 'Data_Currency', 'JoinID', 'Building_Code', 
+                           'Res_Code', 'Weakened_Seismic', ]:
             arcpy.management.DeleteField(in_table=spatial_join, drop_field=field_name)
-
-        # Rename the GEOID10 field to Tract
-        arcpy.management.AlterField(in_table=spatial_join,
-                                    field="GEOID10",
-                                    new_field_name="Tract",
-                                    new_field_alias="Census Tract")
 
         # Delete the previous points feature class
         arcpy.management.Delete(in_data=in_fc)
@@ -69,8 +67,7 @@ if __name__ == '__main__':
     script_dir = Path(__file__).parent
     data_folder = os.path.join(script_dir.parent, "data")
     out_folder = os.path.join(script_dir.parent, "outputs")
+    ubc_97_fc = os.path.join(data_folder, "2023-06-28-ReferenceData.gdb\\Tracts_2020_BCAT_lookup_wUBC97")
+    feature_class = os.path.join(out_folder, "hi_uni.gdb\\hi_uni_points")
 
-    census_tracts = os.path.join(data_folder, "Census_Data.gdb\\Census_Tract_2010")
-    feature_class = os.path.join(out_folder, "ak_uni.gdb\\ak_uni_points")
-
-    main(in_fc=feature_class, census_tract_data=census_tracts)
+    main(in_fc=feature_class, ubc_97_fc=ubc_97_fc)

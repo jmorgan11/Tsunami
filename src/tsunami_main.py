@@ -16,6 +16,7 @@ import convert_to_csv
 import create_fields
 import create_file_gdb
 import extract_fips_county_name
+import extract_ubc_97_zone
 import populate_first_floor
 import populate_found_type_id
 import extract_census_tract
@@ -52,7 +53,8 @@ TSU_CSV_FIELDS = ["accntnum", "location", "BLDG_DED", "BLDG_LIMIT", "CNT_DED",
                   "BLDG_TYPE", "NUM_UNITS", "UNITS_PER_FLOOR"]
 
 def main(in_csv, out_folder, tsunami_polygon, hazus_counties, 
-         census_tract_data, census_blocks_data, dem, process_fields):
+         census_tract_data, census_blocks_data, dem, process_fields,
+         ubc_97_fc):
     """
     Main processing function.
 
@@ -65,6 +67,7 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
         census_blocks - Path to the Census Block feature class.
         dem - Path to the DEM.
         process_fields - Tuple of fields for processing (ID field, Longitude, Latitude)
+        ubc_97_fc - Path to the UBC97Zone feature class.
 
     Returns:
         None
@@ -98,7 +101,7 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
     print("Clipping points...")
     clipped_fc_name = clip_feature_class.main(
        in_fc=os.path.join(file_gdb_path, fc_name),
-       tsunami_polygon=tsunami_polygon) 
+       tsunami_polygon=tsunami_polygon)
 
     # Create a full path to the Points - DONE
     fc_path = str(os.path.join(file_gdb_path, clipped_fc_name))
@@ -113,6 +116,10 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
     # Add the required fields to the feature class - DONE
     print("Adding required fields...")
     create_fields.main(in_fc=fc_path)
+
+    # Get the UBC_97_Zone values
+    print("Extracting UBC 97 Zone Values...")
+    extract_ubc_97_zone.main(in_fc=fc_path, ubc_97_fc=ubc_97_fc)
 
     # Get the FIPs and County Name for each point - DONE
     print("Extracting FIPS and County Names...")
@@ -190,9 +197,9 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
     print("Populating the EqDesignLe field...")
     populate_eq_design_level.main(in_fc=fc_path)
 
-    # Populate the Population fields
-    print("Populating the Population fields...")
-    populate_pop_fields.main(in_fc=fc_path)
+    # # Populate the Population fields
+    # print("Populating the Population fields...")
+    # populate_pop_fields.main(in_fc=fc_path)
 
     # Populate the Latitude and Longitude fields
     print("Populating the Latitude and Longitude fields...")
@@ -212,11 +219,10 @@ if __name__ == '__main__':
     output_folder = os.path.join(script_dir.parent, "outputs")
     hazus_counties_fc = os.path.join(data_folder, "Hazus_Data.gdb\\Counties")
     in_dem = os.path.join(data_folder, "NED_1_3.gdb\\ned_1_3_elev_m")
-    census_pop_fc = os.path.join(data_folder, "Census_Data.gdb\\Census_Tract_Population")
+    census_pop_fc = os.path.join(data_folder, "Census_Data.gdb\\Census_Tract_2010")
     census_blocks = os.path.join(data_folder, "Census_Data.gdb\\Census_Blocks")
-    tsunami_fc = os.path.join(
-        data_folder,
-        "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline")
+    ubc_97_fc = os.path.join(data_folder, "2023-06-28-ReferenceData.gdb\\Tracts_2020_BCAT_lookup_wUBC97")
+    tsunami_fc = os.path.join(data_folder, "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline")
 
     csv_files = [
         "AK_ucmb.csv", "AK_uni.csv", "AK_tsu_unc_mb.csv",
@@ -226,7 +232,7 @@ if __name__ == '__main__':
         "WA_ucmb.csv", "WA_uni.csv", "WA_tsu_unc_mb.csv"
     ]
 
-    INPUT_CSV = "AK_uni.csv"
+    INPUT_CSV = "HI_uni.csv"
     req_fields = ("accntnum", "LON", "LAT")
 
     main(in_csv=os.path.join(data_folder, INPUT_CSV),
@@ -236,5 +242,6 @@ if __name__ == '__main__':
          census_tract_data=census_pop_fc,
          census_blocks_data=census_blocks,
          dem=in_dem,
-         process_fields=req_fields)
+         process_fields=req_fields,
+         ubc_97_fc=ubc_97_fc)
     print("...done")
