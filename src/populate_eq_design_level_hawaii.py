@@ -294,7 +294,11 @@ def main(in_fc, i_code_table):
     Returns:
         None
     """
+    desc = arcpy.Describe(in_fc)
+    oid_field = desc.oidFieldName
+
     fields = [
+        "OID@",
         "Tract",
         "CountyName",
         "AreaSqft",
@@ -305,13 +309,13 @@ def main(in_fc, i_code_table):
     ]
     with arcpy.da.SearchCursor(in_table=in_fc, field_names=fields) as cursor:
         for row in cursor:
-            census_tract = row[0]
-            county_name = row[1]
-            square_feet = row[2]
-            year_built = row[3]
-            occupancy_type = row[4]
-            number_stories = row[5]
-            ubc_97_zone = row[6]
+            census_tract = row[1]
+            county_name = row[2]
+            square_feet = row[3]
+            year_built = row[4]
+            occupancy_type = row[5]
+            number_stories = row[6]
+            ubc_97_zone = row[7]
 
             design_level_id = -9999
 
@@ -333,13 +337,22 @@ def main(in_fc, i_code_table):
             if lookup_table_name in SEISMIC_CODES.keys():
                 column_name = SEISMIC_CODES[lookup_table_name]
                 where_clause = f"TRACT = '{census_tract}'"
-                with arcpy.da.SearchCursor(i_code_table, [column_name], where_clause=where_clause) as cursor:
-                    for row in cursor:
-                        design_level_id = row[0]
+                with arcpy.da.SearchCursor(i_code_table, [column_name], where_clause=where_clause) as table_cursor:
+                    for table_row in table_cursor:
+                        design_level_id = table_row[0]
 
-            print(f"The value is: {design_level_id}")
-            # TODO: Need to calculate the field in the table
-            # TODO: Need to incoporate this into the Main script
+            # Select the current row
+            selected_row = arcpy.management.SelectLayerByAttribute(
+                in_layer_or_view=in_fc, 
+                selection_type="NEW_SELECTION", 
+                where_clause=f"{oid_field} = {row[0]}")
+
+            # Calculate the field
+            arcpy.management.CalculateField(in_table=selected_row, 
+                                            field="EqDesignLe", 
+                                            expression=f"{design_level_id}", 
+                                            expression_type="PYTHON3")
+
 
 if __name__ == "__main__":
     script_dir = Path(__file__).parent
