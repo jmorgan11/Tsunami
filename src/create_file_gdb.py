@@ -5,6 +5,7 @@ Author: Jesse Morgan
 Date: 5/27/2026
 Updates: None
 """
+
 import os
 import sys
 from pathlib import Path
@@ -35,7 +36,9 @@ def main(folder_path, gdb_name):
 
     # Create the file geodatabase
     try:
-        arcpy.management.CreateFileGDB(out_folder_path=folder_path, out_name=file_gdb_name)
+        arcpy.management.CreateFileGDB(
+            out_folder_path=folder_path, out_name=file_gdb_name
+        )
     except arcpy.ExecuteError:
         print(arcpy.GetMessages())
         print(f"ERROR: {file_geodatabase_path} already exists.  Exiting...")
@@ -43,7 +46,8 @@ def main(folder_path, gdb_name):
 
     return file_geodatabase_path
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     script_dir = Path(__file__).parent
     out_folder = os.path.join(script_dir.parent, "outputs")
     out_name = "hi_tsu_unc_mb".lower()
