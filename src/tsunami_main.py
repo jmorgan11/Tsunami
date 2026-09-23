@@ -5,10 +5,12 @@ Author: Jesse Morgan
 Date: 5/27/2026
 Updates: None
 """
+
 import csv
 import os
 import sys
 from pathlib import Path
+import datetime
 import add_usgs_elev
 import clip_feature_class
 import convert_from_csv
@@ -40,21 +42,68 @@ import populate_val_cont
 import populate_val_struct
 
 # These are the fields from the latest Milliman data received
-REQUIRED_CSV_FIELDS = ["location", "BLDG_DED", "BLDG_LIMIT", "CNT_DED", "CNT_LIMIT",
-                       "STATE", "POSTCODE", "COUNTRY", "LON", "LAT", "BLDG_VALUE",
-                       "CNT_VALUE", "CONSTR_CODE", "NUM_STORIES", "YEAR_BUILT",
-                       "foundationtype", "BasementFinishType", "FIRST_FLOOR_ELEV",
-                       "BASE_FLOOD_ELEV", "elev_ft"]
+REQUIRED_CSV_FIELDS = [
+    "location",
+    "BLDG_DED",
+    "BLDG_LIMIT",
+    "CNT_DED",
+    "CNT_LIMIT",
+    "STATE",
+    "POSTCODE",
+    "COUNTRY",
+    "LON",
+    "LAT",
+    "BLDG_VALUE",
+    "CNT_VALUE",
+    "CONSTR_CODE",
+    "NUM_STORIES",
+    "YEAR_BUILT",
+    "foundationtype",
+    "BasementFinishType",
+    "FIRST_FLOOR_ELEV",
+    "BASE_FLOOD_ELEV",
+    "elev_ft",
+]
 
-TSU_CSV_FIELDS = ["accntnum", "location", "BLDG_DED", "BLDG_LIMIT", "CNT_DED",
-                  "CNT_LIMIT", "STATE", "POSTCODE", "COUNTRY", "LON", "LAT", "BLDG_VALUE",
-                  "CNT_VALUE", "CONSTR_CODE", "NUM_STORIES", "YEAR_BUILT", "foundationtype",
-                  "BasementFinishType", "FIRST_FLOOR_ELEV", "BASE_FLOOD_ELEV", "elev_ft", 
-                  "BLDG_TYPE", "NUM_UNITS", "UNITS_PER_FLOOR"]
+TSU_CSV_FIELDS = [
+    "accntnum",
+    "location",
+    "BLDG_DED",
+    "BLDG_LIMIT",
+    "CNT_DED",
+    "CNT_LIMIT",
+    "STATE",
+    "POSTCODE",
+    "COUNTRY",
+    "LON",
+    "LAT",
+    "BLDG_VALUE",
+    "CNT_VALUE",
+    "CONSTR_CODE",
+    "NUM_STORIES",
+    "YEAR_BUILT",
+    "foundationtype",
+    "BasementFinishType",
+    "FIRST_FLOOR_ELEV",
+    "BASE_FLOOD_ELEV",
+    "elev_ft",
+    "BLDG_TYPE",
+    "NUM_UNITS",
+    "UNITS_PER_FLOOR",
+]
 
-def main(in_csv, out_folder, tsunami_polygon, hazus_counties, 
-         census_tract_data, census_blocks_data, dem, process_fields,
-         ubc_97_fc):
+
+def main(
+    in_csv,
+    out_folder,
+    tsunami_polygon,
+    hazus_counties,
+    census_tract_data,
+    census_blocks_data,
+    dem,
+    process_fields,
+    ubc_97_fc,
+):
     """
     Main processing function.
 
@@ -76,7 +125,7 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
     csv_name = os.path.basename(in_csv)
 
     # Get the first row of the CSV to verify all the needed columns exists.
-    with open(in_csv, mode='r', newline='', encoding='utf-8') as file:
+    with open(in_csv, mode="r", newline="", encoding="utf-8") as file:
         reader = csv.reader(file)
         first_row = next(reader)
 
@@ -89,9 +138,10 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
 
     # Create the file geodatabase - DONE
     print("Creating the file geodatabase...")
+    current_date = datetime.datetime.now().strftime("%Y_%m_%d")
     file_gdb_path = create_file_gdb.main(
-        folder_path=out_folder,
-        gdb_name=csv_name.replace(".csv", ""))
+        folder_path=out_folder, gdb_name=csv_name.replace(".csv", f"_{current_date}")
+    )
 
     # Convert the CSV to a feature class - DONE
     print("Converting CSV...")
@@ -100,18 +150,17 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
     # Clip the feature class to the tsunami polygons - DONE
     print("Clipping points...")
     clipped_fc_name = clip_feature_class.main(
-       in_fc=os.path.join(file_gdb_path, fc_name),
-       tsunami_polygon=tsunami_polygon)
+        in_fc=os.path.join(file_gdb_path, fc_name), tsunami_polygon=tsunami_polygon
+    )
 
     # Create a full path to the Points - DONE
     fc_path = str(os.path.join(file_gdb_path, clipped_fc_name))
 
     # Create a CSV from the points with USGS elevation values
     print("Creating USGS Elevation CSV file...")
-    add_usgs_elev.main(fc_path,
-                       dem=dem,
-                       output_folder=out_folder,
-                       process_fields=process_fields)
+    add_usgs_elev.main(
+        fc_path, dem=dem, output_folder=out_folder, process_fields=process_fields
+    )
 
     # Add the required fields to the feature class - DONE
     print("Adding required fields...")
@@ -157,11 +206,11 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
     print("Populating the Content Deductible fields...")
     populate_content_deduct.main(in_fc=fc_path)
 
-   # Populate the SOccTypeID field
+    # Populate the SOccTypeID field
     print("Populating the SOccTypeID field...")
     populate_socc_type_id.main(in_fc=fc_path)
 
-   # Populate the FoundTypeID field
+    # Populate the FoundTypeID field
     print("Populating the FoundTypeID field...")
     populate_found_type_id.main(in_fc=fc_path)
 
@@ -213,7 +262,8 @@ def main(in_csv, out_folder, tsunami_polygon, hazus_counties,
     print("Exporting the CSV...")
     convert_to_csv.main(in_fc=fc_path, output_folder=out_folder)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     script_dir = Path(__file__).parent
     data_folder = os.path.join(script_dir.parent, "data")
     output_folder = os.path.join(script_dir.parent, "outputs")
@@ -221,27 +271,29 @@ if __name__ == '__main__':
     in_dem = os.path.join(data_folder, "NED_1_3.gdb\\ned_1_3_elev_m")
     census_pop_fc = os.path.join(data_folder, "Census_Data.gdb\\Census_Tract_2010")
     census_blocks = os.path.join(data_folder, "Census_Data.gdb\\Census_Blocks")
-    ubc_97_fc = os.path.join(data_folder, "2023-06-28-ReferenceData.gdb\\Tracts_2020_BCAT_lookup_wUBC97")
-    tsunami_fc = os.path.join(data_folder, "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline")
+    ubc_97_fc = os.path.join(
+        data_folder, "2023-06-28-ReferenceData.gdb\\Tracts_2020_BCAT_lookup_wUBC97"
+    )
+    tsunami_fc = os.path.join(
+        data_folder,
+        "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline",
+    )
 
-    csv_files = [
-        "AK_ucmb.csv", "AK_uni.csv", "AK_tsu_unc_mb.csv",
-        "CA_ucmb.csv", "CA_uni.csv",
-        "HI_ucmb.csv", "HI_uni.csv", "HI_tsu_unc_mb.csv",
-        "OR_ucmb.csv", "OR_uni.csv", "OR_tsu_unc_mb.csv",
-        "WA_ucmb.csv", "WA_uni.csv", "WA_tsu_unc_mb.csv"
-    ]
-
-    INPUT_CSV = "HI_uni.csv"
+    INPUT_CSV = "C:\\GIS\\Tsunami\\Scripts\\data\\Milliman_Uniform\\HI_uni.csv"
     req_fields = ("accntnum", "LON", "LAT")
 
-    main(in_csv=os.path.join(data_folder, INPUT_CSV),
-         out_folder=output_folder,
-         tsunami_polygon=tsunami_fc,
-         hazus_counties=hazus_counties_fc,
-         census_tract_data=census_pop_fc,
-         census_blocks_data=census_blocks,
-         dem=in_dem,
-         process_fields=req_fields,
-         ubc_97_fc=ubc_97_fc)
+    main(
+        in_csv=os.path.join(data_folder, INPUT_CSV),
+        out_folder=output_folder,
+        tsunami_polygon=tsunami_fc,
+        hazus_counties=hazus_counties_fc,
+        census_tract_data=census_pop_fc,
+        census_blocks_data=census_blocks,
+        dem=in_dem,
+        process_fields=req_fields,
+        ubc_97_fc=ubc_97_fc,
+    )
     print("...done")
+
+# TODO: Uniform uses original Seismic Design Level
+# TODO: Uncorrelated uses the new Seismic Design Level
