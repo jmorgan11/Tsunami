@@ -44,7 +44,7 @@ FIELDS_DICT = {
     "geometry": ["TEXT", 512],
     "Longitude": ["DOUBLE"],
     "Latitude": ["DOUBLE"],
-    "CBFips_txt": ["TEXT", 15],
+    "CBFips_txt": ["TEXT", 17],
 }
 
 
