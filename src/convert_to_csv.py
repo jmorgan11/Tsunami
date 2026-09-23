@@ -8,7 +8,7 @@ Updates: None
 
 import os
 import sys
-from datetime import datetime
+import datetime
 from pathlib import Path
 import arcpy
 
@@ -26,17 +26,12 @@ def main(in_fc, output_folder):
     """
     try:
         # Get the current date
-        current_date = datetime.now().strftime("%Y_%m_%d")
-
-        # Create CSV output name.
-        out_csv = os.path.join(
-            output_folder, os.path.basename(in_fc) + f"_{current_date}.csv"
-        )
+        current_date = datetime.datetime.now().strftime("%Y_%m_%d")
 
         arcpy.conversion.TableToTable(
             in_rows=in_fc,
-            out_path=output_folder,
-            out_name=os.path.basename(in_fc) + ".csv",
+            out_path=out_folder,
+            out_name=os.path.basename(in_fc) + f"_{current_date}.csv",
             field_mapping=f'ID "ID" true true false 100 Text 0 0,First,#,{in_fc},ID,0,99;'
             f'EqBldgType "EqBldgType" true true false 4 Long 0 0,First,#,{in_fc},EqBldgType,-1,-1;'
             f'EdgBldgTypeClass "EdgBldgTypeClass" true true false 4 Text 0 0,First,#,{in_fc},EdgBldgTypeClass,0,3;'
@@ -49,6 +44,7 @@ def main(in_fc, output_folder):
             f'ValCont "ValCont" true true false 4 Long 0 0,First,#,{in_fc},ValCont,-1,-1;'
             f'AreaSqft "AreaSqft" true true false 8 Double 0 0,First,#,{in_fc},AreaSqft,-1,-1;'
             f'CBFips "CBFips" true true false 15 Text 0 0,First,#,{in_fc},CBFips,0,14;'
+            f'CBFips_txt "CBFips_txt" true true false 15 Text 0 0,First,#,{in_fc},CBFips_txt,0,14;'
             f'SiteElevation_UserDefined_ft "SiteElevation_UserDefined_ft" true true false 8 Double 0 0,First,#,{in_fc},SiteElevation_UserDefined_ft,-1,-1;'
             f'BldgHeight_ft "BldgHeight_ft" true true false 8 Double 0 0,First,#,{in_fc},BldgHeight_ft,-1,-1;'
             f'BuildingLimit "BuildingLimit" true true false 8 Double 0 0,First,#,{in_fc},BuildingLimit,-1,-1;'
@@ -68,6 +64,6 @@ def main(in_fc, output_folder):
 if __name__ == "__main__":
     script_dir = Path(__file__).parent
     out_folder = os.path.join(script_dir.parent, "outputs")
-    feature_class = os.path.join(out_folder, "hi_tsu_unc_mb.gdb/hi_tsu_unc_mb_points")
+    feature_class = os.path.join(out_folder, "hi_uni.gdb/hi_uni_points")
 
     main(in_fc=feature_class, output_folder=out_folder)
