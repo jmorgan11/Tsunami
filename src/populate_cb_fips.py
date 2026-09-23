@@ -5,6 +5,7 @@ Author: Jesse Morgan
 Date: 5/27/2026
 Updates: None
 """
+
 import os
 import sys
 from pathlib import Path
@@ -40,7 +41,8 @@ def main(in_fc, census_blocks):
             out_feature_class=spatial_join_path,
             join_operation="JOIN_ONE_TO_ONE",
             join_type="KEEP_ALL",
-            match_option="CLOSEST")
+            match_option="CLOSEST",
+        )
 
         # Drop extra fields
         for field_name in ["Join_Count", "TARGET_FID"]:
@@ -50,14 +52,24 @@ def main(in_fc, census_blocks):
         arcpy.management.Delete(in_data=in_fc)
 
         # Rename the spatial join feature class
-        arcpy.management.Rename(in_data=spatial_join, out_data=os.path.join(db_path, base_name))
+        arcpy.management.Rename(
+            in_data=spatial_join, out_data=os.path.join(db_path, base_name)
+        )
+
+        # Calculate the CBFips_txt field
+        arcpy.management.CalculateField(
+            in_table=os.path.join(db_path, base_name),
+            field="CBFips_txt",
+            expression="!CBFips!",
+            expression_type="PYTHON3",
+        )
 
     except arcpy.ExecuteError:
         print(arcpy.GetMessages())
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     script_dir = Path(__file__).parent
     data_folder = os.path.join(script_dir.parent, "data")
     out_folder = os.path.join(script_dir.parent, "outputs")

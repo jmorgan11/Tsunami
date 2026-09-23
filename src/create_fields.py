@@ -5,11 +5,11 @@ Author: Jesse Morgan
 Date: 5/27/2026
 Updates: None
 """
+
 import sys
 import os
 from pathlib import Path
 import arcpy
-
 
 FIELDS_DICT = {
     "BuildingValue_Average": ["DOUBLE"],
@@ -44,7 +44,9 @@ FIELDS_DICT = {
     "geometry": ["TEXT", 512],
     "Longitude": ["DOUBLE"],
     "Latitude": ["DOUBLE"],
+    "CBFips_txt": ["TEXT", 15],
 }
+
 
 def main(in_fc):
     """
@@ -65,39 +67,41 @@ def main(in_fc):
                     in_table=in_fc,
                     field_name=field,
                     field_type=values[0],
-                    field_length=values[1])
+                    field_length=values[1],
+                )
 
                 # Calculate the NsiID field to OBJECTID.  Otherwise, use "UNK"
                 if field == "NsiID":
                     expression = "!OBJECTID!"
                 else:
-                    expression = "\"UNK\""
+                    expression = '"UNK"'
 
                 arcpy.management.CalculateField(
                     in_table=in_fc,
                     field=field,
                     expression=expression,
-                    expression_type="PYTHON3")
+                    expression_type="PYTHON3",
+                )
             else:
                 # Add Numeric fields
                 arcpy.management.AddField(
-                    in_table=in_fc,
-                    field_name=field,
-                    field_type=values[0])
+                    in_table=in_fc, field_name=field, field_type=values[0]
+                )
 
                 # Calculate it to -9999
                 arcpy.management.CalculateField(
                     in_table=in_fc,
                     field=field,
                     expression=-9999,
-                    expression_type="PYTHON3")
+                    expression_type="PYTHON3",
+                )
     except arcpy.ExecuteError:
         print(arcpy.GetMessages())
         print(f"ERROR: Could not add the field '{field}' and calculate it.  Exiting...")
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     script_dir = Path(__file__).parent
     out_folder = os.path.join(script_dir.parent, "outputs")
     feature_class = os.path.join(out_folder, "hi_tsu_unc_mb.gdb\\hi_tsu_unc_mb_points")
