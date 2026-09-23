@@ -30,7 +30,7 @@ def main(in_fc, output_folder):
 
         arcpy.conversion.TableToTable(
             in_rows=in_fc,
-            out_path=out_folder,
+            out_path=output_folder,
             out_name=os.path.basename(in_fc) + f"_{current_date}.csv",
             field_mapping=f'ID "ID" true true false 100 Text 0 0,First,#,{in_fc},ID,0,99;'
             f'EqBldgType "EqBldgType" true true false 4 Long 0 0,First,#,{in_fc},EqBldgType,-1,-1;'
