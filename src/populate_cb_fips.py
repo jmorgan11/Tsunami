@@ -60,7 +60,7 @@ def main(in_fc, census_blocks):
         arcpy.management.CalculateField(
             in_table=os.path.join(db_path, base_name),
             field="CBFips_txt",
-            expression="!CBFips!",
+            expression='"\'" + !CBFips! + "\'"',
             expression_type="PYTHON3",
         )
 
