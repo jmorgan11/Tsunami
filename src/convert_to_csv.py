@@ -44,7 +44,7 @@ def main(in_fc, output_folder):
             f'ValCont "ValCont" true true false 4 Long 0 0,First,#,{in_fc},ValCont,-1,-1;'
             f'AreaSqft "AreaSqft" true true false 8 Double 0 0,First,#,{in_fc},AreaSqft,-1,-1;'
             f'CBFips "CBFips" true true false 15 Text 0 0,First,#,{in_fc},CBFips,0,14;'
-            f'CBFips_txt "CBFips_txt" true true false 15 Text 0 0,First,#,{in_fc},CBFips_txt,0,14;'
+            f'CBFips_txt "CBFips_txt" true true false 17 Text 0 0,First,#,{in_fc},CBFips_txt,0,17;'
             f'SiteElevation_UserDefined_ft "SiteElevation_UserDefined_ft" true true false 8 Double 0 0,First,#,{in_fc},SiteElevation_UserDefined_ft,-1,-1;'
             f'BldgHeight_ft "BldgHeight_ft" true true false 8 Double 0 0,First,#,{in_fc},BldgHeight_ft,-1,-1;'
             f'BuildingLimit "BuildingLimit" true true false 8 Double 0 0,First,#,{in_fc},BuildingLimit,-1,-1;'
@@ -64,6 +64,6 @@ def main(in_fc, output_folder):
 if __name__ == "__main__":
     script_dir = Path(__file__).parent
     out_folder = os.path.join(script_dir.parent, "outputs")
-    feature_class = os.path.join(out_folder, "hi_uni.gdb/hi_uni_points")
+    feature_class = os.path.join(out_folder, "hi_uni_2026_09_23.gdb\\hi_uni_points")
 
     main(in_fc=feature_class, output_folder=out_folder)
