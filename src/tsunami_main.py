@@ -15,6 +15,7 @@ import add_usgs_elev
 import clip_feature_class
 import convert_from_csv
 import convert_to_csv
+import convert_to_csv_by_county
 import create_fields
 import create_file_gdb
 import extract_fips_county_name
@@ -261,6 +262,10 @@ def main(
     # Output the CSV
     print("Exporting the CSV...")
     convert_to_csv.main(in_fc=fc_path, output_folder=out_folder)
+
+    # Output the CSV by county
+    print("Exporting the CSV by county...")
+    convert_to_csv_by_county.main(in_fc=fc_path, output_folder=out_folder)
 
 
 if __name__ == "__main__":
