@@ -76,7 +76,9 @@ def main(in_fc, dem, output_folder, process_fields, state_name, basket_name):
         current_date = datetime.datetime.now().strftime("%Y_%m_%d")
 
         # Delete the output file if it already exists
-        out_name = f"{state_abbreviation}_state_{basket_name}_usgs_elevation_{current_date}.csv"
+        out_name = (
+            f"{state_abbreviation}_state_usgs_elev_{basket_name}_{current_date}.csv"
+        )
 
         if arcpy.Exists(os.path.join(output_folder, out_name)):
             arcpy.management.Delete(os.path.join(output_folder, out_name))
