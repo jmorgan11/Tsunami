@@ -2,3 +2,5 @@ data/
 notebooks/
 outputs/
 src/__pycache__
+.vscode/settings.json
+.gitignore
