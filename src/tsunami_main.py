@@ -93,6 +93,8 @@ TSU_CSV_FIELDS = [
     "UNITS_PER_FLOOR",
 ]
 
+REQ_FIELDS = ("accntnum", "LON", "LAT")
+
 
 def main(
     in_csv,
@@ -104,6 +106,8 @@ def main(
     dem,
     process_fields,
     ubc_97_fc,
+    state_name,
+    basket_name,
 ):
     """
     Main processing function.
@@ -118,6 +122,8 @@ def main(
         dem - Path to the DEM.
         process_fields - Tuple of fields for processing (ID field, Longitude, Latitude)
         ubc_97_fc - Path to the UBC97Zone feature class.
+        state_name - Name of the state being processed
+        basket_name - Basket type being processed
 
     Returns:
         None
@@ -160,7 +166,12 @@ def main(
     # Create a CSV from the points with USGS elevation values
     print("Creating USGS Elevation CSV file...")
     add_usgs_elev.main(
-        fc_path, dem=dem, output_folder=out_folder, process_fields=process_fields
+        fc_path,
+        dem=dem,
+        output_folder=out_folder,
+        process_fields=process_fields,
+        state_name=state_name,
+        basket_name=basket_name,
     )
 
     # Add the required fields to the feature class - DONE
@@ -261,11 +272,21 @@ def main(
 
     # Output the CSV
     print("Exporting the CSV...")
-    convert_to_csv.main(in_fc=fc_path, output_folder=out_folder)
+    convert_to_csv.main(
+        in_fc=fc_path,
+        output_folder=out_folder,
+        state_name=state_name,
+        basket_name=basket_name,
+    )
 
     # Output the CSV by county
     print("Exporting the CSV by county...")
-    convert_to_csv_by_county.main(in_fc=fc_path, output_folder=out_folder)
+    convert_to_csv_by_county.main(
+        in_fc=fc_path,
+        output_folder=out_folder,
+        state_name=state_name,
+        basket_name=basket_name,
+    )
 
 
 if __name__ == "__main__":
@@ -284,20 +305,65 @@ if __name__ == "__main__":
         "ASCE_Tsunami_Design_Zones.gdb\\ts2022_Tsunami_Design_Zone_Clipped_To_Shoreline",
     )
 
-    INPUT_CSV = "C:\\GIS\\Tsunami\\Scripts\\data\\Milliman_Uniform\\HI_uni.csv"
-    req_fields = ("accntnum", "LON", "LAT")
+    # PROCESS_DICT = {
+    #     "Alaska_uni": os.path.join(data_folder, "Milliman_Uniform\\AK_uni.csv"),
+    #     "California_uni": os.path.join(data_folder, "Milliman_Uniform\\CA_uni.csv"),
+    #     "Hawaii_uni": os.path.join(data_folder, "Milliman_Uniform\\HI_uni.csv"),
+    #     "Oregon_uni": os.path.join(data_folder, "Milliman_Uniform\\OR_uni.csv"),
+    #     "Washington_uni": os.path.join(data_folder, "Milliman_Uniform\\WA_uni.csv"),
+    #     "Alaska_unc": os.path.join(
+    #         data_folder, "Milliman_Uncorrelated\\AK_tsu_unc_mb.csv"
+    #     ),
+    #     "California_unc": os.path.join(
+    #         data_folder, "Milliman_Uncorrelated\\CA_tsu_unc_mb.csv"
+    #     ),
+    #     "Hawaii_unc": os.path.join(
+    #         data_folder, "Milliman_Uncorrelated\\HI_tsu_unc_mb.csv"
+    #     ),
+    #     "Oregon_unc": os.path.join(
+    #         data_folder, "Milliman_Uncorrelated\\OR_tsu_unc_mb.csv"
+    #     ),
+    #     "Washington_unc": os.path.join(
+    #         data_folder, "Milliman_Uncorrelated\\WA_tsu_unc_mb.csv"
+    #     ),
+    # }
 
-    main(
-        in_csv=os.path.join(data_folder, INPUT_CSV),
-        out_folder=output_folder,
-        tsunami_polygon=tsunami_fc,
-        hazus_counties=hazus_counties_fc,
-        census_tract_data=census_pop_fc,
-        census_blocks_data=census_blocks,
-        dem=in_dem,
-        process_fields=req_fields,
-        ubc_97_fc=ubc_97_fc,
-    )
+    PROCESS_DICT = {
+        "Hawaii_uni": os.path.join(data_folder, "Milliman_Uniform\\HI_uni.csv"),
+        "Hawaii_unc": os.path.join(
+            data_folder, "Milliman_Uncorrelated\\HI_tsu_unc_mb.csv"
+        ),
+    }
+
+    for key, value in PROCESS_DICT.items():
+        if key.endswith("uni"):
+            final_output_folder = os.path.join(output_folder, "Milliman_Uniform")
+        else:
+            final_output_folder = os.path.join(output_folder, "Milliman_Uncorrelated")
+
+        # Get the state name
+        state = key[:-4]
+
+        # Determine the basket type
+        basket = "uncorrelated"
+        if key[:-3] == "uni":
+            basket = "uniform"
+
+        print(f"Processing {state} to {final_output_folder}")
+
+        main(
+            in_csv=os.path.join(data_folder, value),
+            out_folder=final_output_folder,
+            tsunami_polygon=tsunami_fc,
+            hazus_counties=hazus_counties_fc,
+            census_tract_data=census_pop_fc,
+            census_blocks_data=census_blocks,
+            dem=in_dem,
+            process_fields=REQ_FIELDS,
+            ubc_97_fc=ubc_97_fc,
+            state_name=state,
+            basket_name=basket,
+        )
     print("...done")
 
 # TODO: Uniform uses original Seismic Design Level

@@ -21,7 +21,7 @@ from arcpy.sa import ExtractMultiValuesToPoints
 METERS_TO_FEET = 3.2808399
 
 
-def main(in_fc, dem, output_folder, process_fields):
+def main(in_fc, dem, output_folder, process_fields, state_name, basket_name):
     """
     Main function.
 
@@ -30,11 +30,23 @@ def main(in_fc, dem, output_folder, process_fields):
         dem - The DEM to derived the elevation values from.
         output_folder - Path to export the CSV
         process_fields - Tuple of fields for processing (ID field, Longitude, Latitude)
+        state_name - State name being processed.
+        basket_name - Type of basket being processed.
 
     Returns:
         None
     """
     try:
+        # Get the state abbreviation
+        state_dict = {
+            "Alaska": "ak",
+            "California": "ca",
+            "Hawaii": "hi",
+            "Oregon": "or",
+            "Washington": "wa",
+        }
+        state_abbreviation = state_dict.get(state_name, "xx")
+
         # Drop fields if it already exists
         if "ned_1_3_elev_m" in [
             field.name for field in arcpy.ListFields(dataset=in_fc)
@@ -64,10 +76,7 @@ def main(in_fc, dem, output_folder, process_fields):
         current_date = datetime.datetime.now().strftime("%Y_%m_%d")
 
         # Delete the output file if it already exists
-        out_name = (
-            os.path.basename(in_fc).replace("_points", "_usgs_elevation")
-            + f"_{current_date}.csv"
-        )
+        out_name = f"{state_abbreviation}_state_{basket_name}_usgs_elevation_{current_date}.csv"
 
         if arcpy.Exists(os.path.join(output_folder, out_name)):
             arcpy.management.Delete(os.path.join(output_folder, out_name))

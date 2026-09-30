@@ -7,6 +7,20 @@ Updates: None
 
 Note: Scope of work only includes California, Oregon, Washington, Alaska and Hawaii.
 
+Building Type - Hazus 
+-----------------------------------------------------------------------------
+RES2  - MOBILE_MANUFACTURED_HOME
+  ?   - NON_RESIDENTIAL_BUILDING
+RES3A - ONE_TO_FOUR_FAMILY_BUILDING
+RES1? - OTHER_RESIDENTIAL_BUILDING
+RES3A - RESIDENTIAL_CONDOMINIUM_BUILDING and NUM_UNITS is  1 -  2
+RES3B - RESIDENTIAL_CONDOMINIUM_BUILDING and NUM_UNITS is  3 -  4
+RES3C - RESIDENTIAL_CONDOMINIUM_BUILDING and NUM_UNITS is  5 -  9
+RES3D - RESIDENTIAL_CONDOMINIUM_BUILDING and NUM_UNITS is 10 - 19
+RES3E - RESIDENTIAL_CONDOMINIUM_BUILDING and NUM_UNITS is 20 - 40
+RES3F - RESIDENTIAL_CONDOMINIUM_BUILDING and NUM_UNITS is 50+
+RES1  - RESIDENTIAL_UNIT
+
 Note: Code is only written for MDI data.
 """
 import os

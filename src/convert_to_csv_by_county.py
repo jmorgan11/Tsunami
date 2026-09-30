@@ -13,17 +13,20 @@ from pathlib import Path
 import arcpy
 
 
-def main(in_fc, output_folder):
+def main(in_fc, output_folder, state_name, basket_name):
     """
     Main function.
 
     Arguments:
         in_fc - Path to the feature class to process.
         output_folder - Location of the where the CSV will be created.
+        state_name - Name of the state being processed.
+        basket_name - Type of basket being processed.
 
     Returns:
         None
     """
+
     try:
         # Get a list of county names
         county_names = [
@@ -35,6 +38,16 @@ def main(in_fc, output_folder):
         # Get the current date
         current_date = datetime.datetime.now().strftime("%Y_%m_%d")
 
+        # Get the state abbreviation
+        state_dict = {
+            "Alaska": "ak",
+            "California": "ca",
+            "Hawaii": "hi",
+            "Oregon": "or",
+            "Washington": "wa",
+        }
+        state_abbreviation = state_dict.get(state_name, "xx")
+
         # Iterate through the county names
         for county_name in county_names:
             # Create the query
@@ -43,8 +56,7 @@ def main(in_fc, output_folder):
             arcpy.conversion.TableToTable(
                 in_rows=in_fc,
                 out_path=output_folder,
-                out_name=os.path.basename(in_fc)
-                + f"_{county_name.lower()}_{current_date}.csv",
+                out_name=f"{state_abbreviation}_{county_name.lower()}_{basket_name}_{current_date}.csv",
                 where_clause=sql_query,
                 field_mapping=f'ID "ID" true true false 100 Text 0 0,First,#,{in_fc},ID,0,99;'
                 f'EqBldgType "EqBldgType" true true false 4 Long 0 0,First,#,{in_fc},EqBldgType,-1,-1;'
