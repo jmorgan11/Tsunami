@@ -88,7 +88,7 @@ def main(in_fc, dem, output_folder, process_fields, state_name, basket_name):
             in_rows=in_fc,
             out_path=output_folder,
             out_name=out_name,
-            field_mapping=f'Building ID "{process_fields[0]}" true true false 100 Text 0 0,First,#,{in_fc},{process_fields[0]},0,99;'
+            field_mapping=f'Building_ID "{process_fields[0]}" true true false 100 Text 0 0,First,#,{in_fc},{process_fields[0]},0,99;'
             f'Longitude "{process_fields[1]}" true true false 8 Double 0 0,First,#,{in_fc},{process_fields[1]},-1,-1;'
             f'Latitude "{process_fields[2]}" true true false 8 Double 0 0,First,#,{in_fc},{process_fields[2]},-1,-1;'
             f'USGS_ground_elev_ft "USGS_ground_elev_ft" true true false 8 Double 0 0,First,#,{in_fc},USGS_ground_elev_ft,-1,-1',
@@ -102,10 +102,15 @@ def main(in_fc, dem, output_folder, process_fields, state_name, basket_name):
 if __name__ == "__main__":
     script_dir = Path(__file__).parent
     out_folder = os.path.join(script_dir.parent, "outputs")
-    csv_output_folder = os.path.join(out_folder, "USGS_Elevation_CSVs")
+    csv_output_folder = os.path.join(out_folder, "Milliman_Uniform")
     data_folder = os.path.join(script_dir.parent, "data")
     in_dem = os.path.join(data_folder, "NED_1_3.gdb\\ned_1_3_elev_m")
-    fc_path = os.path.join(out_folder, "hi_tsu_unc_mb.gdb", "hi_tsu_unc_mb_full_points")
+    fc_path = os.path.join(
+        out_folder,
+        "Milliman_Uniform",
+        "ca_uni_2026_09_30.gdb",
+        "ca_uni_points",
+    )
     req_fields = ("accntnum", "LON", "LAT")
 
     main(
@@ -113,4 +118,6 @@ if __name__ == "__main__":
         dem=in_dem,
         output_folder=csv_output_folder,
         process_fields=req_fields,
+        state_name="California",
+        basket_name="uniform",
     )
