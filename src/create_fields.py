@@ -45,6 +45,7 @@ FIELDS_DICT = {
     "Longitude": ["DOUBLE"],
     "Latitude": ["DOUBLE"],
     "CBFips_txt": ["TEXT", 17],
+    "CountyFips_txt": ["TEXT", 7],
 }
 
 

@@ -58,6 +58,7 @@ def main(in_fc, output_folder, state_name, basket_name):
             f'CBFips "CBFips" true true false 15 Text 0 0,First,#,{in_fc},CBFips,0,14;'
             f'CBFips_txt "CBFips_txt" true true false 17 Text 0 0,First,#,{in_fc},CBFips_txt,0,17;'
             f'CountyFips "CountyFips" true true false 5 Text 0 0,First,#,{in_fc},CountyFips,0,5;'
+            f'CountyFips_txt "CountyFips_txt" true true false 7 Text 0 0,First,#,{in_fc},CountyFips_txt,0,7;'
             f'CountyName "CountyName" true true false 40 Text 0 0,First,#,{in_fc},CountyName,0,40;'
             f'SiteElevation_UserDefined_ft "SiteElevation_UserDefined_ft" true true false 8 Double 0 0,First,#,{in_fc},SiteElevation_UserDefined_ft,-1,-1;'
             f'BldgHeight_ft "BldgHeight_ft" true true false 8 Double 0 0,First,#,{in_fc},BldgHeight_ft,-1,-1;'

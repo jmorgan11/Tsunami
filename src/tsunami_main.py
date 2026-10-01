@@ -306,41 +306,38 @@ if __name__ == "__main__":
     )
 
     PROCESS_DICT = {
-        "Alaska_uni": os.path.join(data_folder, "Milliman_Uniform\\AK_uni.csv"),
+        # "Alaska_uni": os.path.join(data_folder, "Milliman_Uniform\\AK_uni.csv"),
         "California_uni": os.path.join(data_folder, "Milliman_Uniform\\CA_uni.csv"),
-        "Hawaii_uni": os.path.join(data_folder, "Milliman_Uniform\\HI_uni.csv"),
-        "Oregon_uni": os.path.join(data_folder, "Milliman_Uniform\\OR_uni.csv"),
-        "Washington_uni": os.path.join(data_folder, "Milliman_Uniform\\WA_uni.csv"),
-        "Alaska_unc": os.path.join(
-            data_folder, "Milliman_Uncorrelated\\AK_tsu_unc_mb.csv"
-        ),
-        "California_unc": os.path.join(
-            data_folder, "Milliman_Uncorrelated\\CA_tsu_unc_mb.csv"
-        ),
-        "Hawaii_unc": os.path.join(
-            data_folder, "Milliman_Uncorrelated\\HI_tsu_unc_mb.csv"
-        ),
-        "Oregon_unc": os.path.join(
-            data_folder, "Milliman_Uncorrelated\\OR_tsu_unc_mb.csv"
-        ),
-        "Washington_unc": os.path.join(
-            data_folder, "Milliman_Uncorrelated\\WA_tsu_unc_mb.csv"
-        ),
+        # "Hawaii_uni": os.path.join(data_folder, "Milliman_Uniform\\HI_uni.csv"),
+        # "Oregon_uni": os.path.join(data_folder, "Milliman_Uniform\\OR_uni.csv"),
+        # "Washington_uni": os.path.join(data_folder, "Milliman_Uniform\\WA_uni.csv"),
+        # "Alaska_unc": os.path.join(
+        #     data_folder, "Milliman_Uncorrelated\\AK_tsu_unc_mb.csv"
+        # ),
+        # "California_unc": os.path.join(
+        #     data_folder, "Milliman_Uncorrelated\\CA_tsu_unc_mb.csv"
+        # ),
+        # "Hawaii_unc": os.path.join(
+        #     data_folder, "Milliman_Uncorrelated\\HI_tsu_unc_mb.csv"
+        # ),
+        # "Oregon_unc": os.path.join(
+        #     data_folder, "Milliman_Uncorrelated\\OR_tsu_unc_mb.csv"
+        # ),
+        # "Washington_unc": os.path.join(
+        #     data_folder, "Milliman_Uncorrelated\\WA_tsu_unc_mb.csv"
+        # ),
     }
 
     for key, value in PROCESS_DICT.items():
         if key.endswith("uni"):
             final_output_folder = os.path.join(output_folder, "Milliman_Uniform")
+            basket = "uniform"
         else:
             final_output_folder = os.path.join(output_folder, "Milliman_Uncorrelated")
+            basket = "uncorrelated"
 
         # Get the state name
         state = key[:-4]
-
-        # Determine the basket type
-        basket = "uncorrelated"
-        if key[:-3] == "uni":
-            basket = "uniform"
 
         print(f"Processing {state} to {final_output_folder}")
 

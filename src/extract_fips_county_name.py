@@ -5,6 +5,7 @@ Author: Jesse Morgan
 Date: 5/27/2026
 Updates: None
 """
+
 import os
 import sys
 from pathlib import Path
@@ -40,28 +41,48 @@ def main(in_fc, hazus_counties):
             out_feature_class=spatial_join_path,
             join_operation="JOIN_ONE_TO_ONE",
             join_type="KEEP_ALL",
-            match_option="CLOSEST")
+            match_option="CLOSEST",
+        )
 
         # Drop extra fields
-        for field_name in ["Join_Count", "TARGET_FID", "CountyFips3", "State",
-                           "StateFips", "NumTracts", "TSCounty"]:
+        for field_name in [
+            "Join_Count",
+            "TARGET_FID",
+            "CountyFips3",
+            "State",
+            "StateFips",
+            "NumTracts",
+            "TSCounty",
+        ]:
             arcpy.management.DeleteField(in_table=spatial_join, drop_field=field_name)
 
         # Delete the previous points feature class
         arcpy.management.Delete(in_data=in_fc)
 
         # Rename the spatial join feature class
-        arcpy.management.Rename(in_data=spatial_join, out_data=os.path.join(db_path, base_name))
+        arcpy.management.Rename(
+            in_data=spatial_join, out_data=os.path.join(db_path, base_name)
+        )
+
+        # Calculate the COFips_txt field
+        arcpy.management.CalculateField(
+            in_table=os.path.join(db_path, base_name),
+            field="CountyFips_txt",
+            expression='"\'" + !CountyFips! + "\'"',
+            expression_type="PYTHON3",
+        )
 
     except arcpy.ExecuteError:
         print(arcpy.GetMessages())
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     script_dir = Path(__file__).parent
     data_folder = os.path.join(script_dir.parent, "data")
     out_folder = os.path.join(script_dir.parent, "outputs")
     hazus_counties_fc = os.path.join(data_folder, "Hazus_Data.gdb\\Counties")
-    feature_class = os.path.join(out_folder, "hi_tsu_unc_mb.gdb\\hi_tsu_unc_mb_points")
+    feature_class = os.path.join(
+        out_folder, "Milliman_Uniform\hi_uni_2026_10_01.gdb\\hi_uni_points"
+    )
     main(in_fc=feature_class, hazus_counties=hazus_counties_fc)
